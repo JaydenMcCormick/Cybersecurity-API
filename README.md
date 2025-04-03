@@ -1,9 +1,10 @@
 # Cybersecurity-API
 
-# PullRequestGeneratorAPI
-
-To install FastAPI with standard dependencies, run the following:
-pip install "fastapi[standard]"
+To install our necessary packages, run the following:
+pip install fastapi[all]
+pip install "uvicorn[standard]"
+pip install sqlalchemy
+pip install psycopg2
 
 Next, to get the server running, run:
 fastapi dev main.py
