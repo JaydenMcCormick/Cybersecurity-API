@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from config import settings
 
 engine = create_engine(
-    settings.sqlalchemy_string, connect_args={'sslmode':'require'}
+    settings.sqlalchemy_string, connect_args={'sslmode':'disable'}
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()

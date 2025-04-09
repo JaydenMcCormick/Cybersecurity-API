@@ -14,8 +14,9 @@ class UserCreate(UserBase):
 class User(UserBase):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
 
 # Course Schemas
 class CourseBase(BaseModel):
@@ -29,8 +30,9 @@ class CourseCreate(CourseBase):
 class Course(CourseBase):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
 
 # Enrollment Schemas
 class EnrollmentBase(BaseModel):
@@ -43,8 +45,9 @@ class EnrollmentCreate(EnrollmentBase):
 class Enrollment(EnrollmentBase):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
 
 # Assignment Schemas
 class AssignmentBase(BaseModel):
@@ -59,8 +62,9 @@ class AssignmentCreate(AssignmentBase):
 class Assignment(AssignmentBase):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
 
 # Submission Schemas
 class SubmissionBase(BaseModel):
@@ -75,5 +79,6 @@ class Submission(SubmissionBase):
     id: int
     submitted_at: Optional[datetime] = None
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
