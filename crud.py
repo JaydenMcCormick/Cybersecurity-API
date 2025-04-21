@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
-from models import User, Course, Enrollment, Assignment, Submission
+from models import User, Course, Enrollment, Assignment, Submission, DiscussionPost
 import schemas
+import bleach
 
 # Users
 def create_user(db: Session, user: schemas.UserCreate):
@@ -55,10 +56,10 @@ def get_assignment(db: Session, assignment_id: int):
 def get_assignments(db: Session, skip: int = 0, limit: int = 100):
     return db.query(Assignment).offset(skip).limit(limit).all()
 
-
 # Submissions
 def create_submission(db: Session, submission: schemas.SubmissionCreate):
-    db_submission = Submission(**submission.dict())
+    clean_content = bleach.clean(submission.content) if submission.content else None
+    db_submission = Submission(**submission.dict(), content=clean_content)
     db.add(db_submission)
     db.commit()
     db.refresh(db_submission)
@@ -69,3 +70,15 @@ def get_submission(db: Session, submission_id: int):
 
 def get_submissions(db: Session, skip: int = 0, limit: int = 100):
     return db.query(Submission).offset(skip).limit(limit).all()
+
+# Discussion
+def create_post(db: Session, post: schemas.DiscussionPostCreate):
+    clean_content = bleach.clean(post.content)
+    db_post = DiscussionPost(author=post.author, content=clean_content)
+    db.add(db_post)
+    db.commit()
+    db.refresh(db_post)
+    return db_post
+
+def get_posts(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(DiscussionPost).offset(skip).limit(limit).all()

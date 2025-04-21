@@ -14,7 +14,6 @@ class User(Base):
     enrollments = relationship("Enrollment", back_populates="user")
     submissions = relationship("Submission", back_populates="user")
 
-
 # --- COURSES TABLE ---
 class Course(Base):
     __tablename__ = 'courses'
@@ -27,7 +26,6 @@ class Course(Base):
     enrollments = relationship("Enrollment", back_populates="course")
     assignments = relationship("Assignment", back_populates="course")
 
-
 # --- ENROLLMENTS TABLE ---
 class Enrollment(Base):
     __tablename__ = 'enrollments'
@@ -37,7 +35,6 @@ class Enrollment(Base):
 
     user = relationship("User", back_populates="enrollments")
     course = relationship("Course", back_populates="enrollments")
-
 
 # --- ASSIGNMENTS TABLE ---
 class Assignment(Base):
@@ -51,7 +48,6 @@ class Assignment(Base):
     course = relationship("Course", back_populates="assignments")
     submissions = relationship("Submission", back_populates="assignment")
 
-
 # --- SUBMISSIONS TABLE ---
 class Submission(Base):
     __tablename__ = 'submissions'
@@ -64,6 +60,12 @@ class Submission(Base):
     assignment = relationship("Assignment", back_populates="submissions")
     user = relationship("User", back_populates="submissions")
 
+# --- DISCUSSION POSTS TABLE ---
+class DiscussionPost(Base):
+    __tablename__ = 'discussion_posts'
+    id = Column(Integer, primary_key=True, index=True)
+    author = Column(String(100), nullable=False)
+    content = Column(Text, nullable=False)
 
 # --- CREATE TABLES ---
 Base.metadata.create_all(engine)

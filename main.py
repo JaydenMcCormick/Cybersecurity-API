@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form, Query, Request
 from sqlalchemy.orm import Session
 from typing import List
 from fastapi.middleware.cors import CORSMiddleware
@@ -6,11 +6,22 @@ from database import SessionLocal, engine
 import models
 import schemas
 import crud
+import shutil
+import os
+import uuid
+from pathlib import Path
 
-# Create all tables
+# Rate limiting imports
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+
+# Create DB tables
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Canvas Example API")
+
+# CORS (adjust for production)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -19,12 +30,65 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Rate limiter setup
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# DB session
 def get_db():
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
+
+# Upload config
+UPLOAD_DIR = "uploads"
+ALLOWED_EXTENSIONS = {".doc", ".docx"}
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+@app.post("/upload/")
+@limiter.limit("3/minute")
+async def upload_file(assignment_id: int = Form(...), file: UploadFile = File(...), request: Request = None):
+    ext = Path(file.filename).suffix.lower()
+    if ext not in ALLOWED_EXTENSIONS:
+        raise HTTPException(status_code=400, detail="Unsupported file type.")
+
+    safe_filename = f"{uuid.uuid4().hex}{ext}"
+    file_path = os.path.join(UPLOAD_DIR, safe_filename)
+
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    return {
+        "original_filename": file.filename,
+        "stored_filename": safe_filename,
+        "assignment_id": assignment_id,
+        "message": "File uploaded successfully"
+    }
+
+@app.get("/safe-script/")
+def safe_script(script: str = Query(..., enum=["hello", "utility"])):
+    allowed_scripts = {
+        "hello": "scripts/hello.py",
+        "utility": "scripts/utility.py"
+    }
+
+    filepath = allowed_scripts.get(script)
+    if not filepath or not os.path.exists(filepath):
+        raise HTTPException(status_code=404, detail="Script not found")
+
+    try:
+        with open(filepath, "r") as f:
+            content = f.read()
+        return {
+            "script": script,
+            "content": content,
+            "message": "File safely read, not executed"
+        }
+    except Exception as e:
+        return {"error": str(e)}
 
 # Users
 @app.post("/users/", response_model=schemas.User)
