@@ -21,7 +21,7 @@ http://localhost:8000/docs
 What we have:
 Vulnerability                          Fix Implemented                        Location                   How It Fixes the Issue
 
-SQL Injection                          SQLAlchemy ORM                         crud.py                    Uses parameterized queries instead of raw SQL
+SQL Injection                          SQLAlchemy ORM                         crud.py (db queries)       Uses parameterized queries instead of raw SQL
 Arbitrary File Upload                  Extension whitelist                    main.py                    Only allows .doc/.docx uploads
 Filename Collisions / Path Traversal   uuid + Path().suffix                   main.py                    Prevents unsafe filenames and overwriting
 Insecure File Execution                Whitelist-based file access            main.py                    Only reads safe, predefined script files

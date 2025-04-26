@@ -14,11 +14,16 @@ class UserBase(BaseModel):
     email: EmailStr
     role: Literal["student", "instructor", "admin"]
 
-class UserCreate(UserBase): pass
+class UserCreate(UserBase):
+    password: str
 
 class User(UserBase):
     id: int
     model_config = {"from_attributes": True}
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
 
 # Course schemas
 class CourseBase(BaseModel):

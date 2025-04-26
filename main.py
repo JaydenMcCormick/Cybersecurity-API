@@ -10,6 +10,7 @@ import shutil
 import os
 import uuid
 from pathlib import Path
+from schemas import UserLogin
 
 # Rate limiting imports
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -162,3 +163,10 @@ def read_submission(submission_id: int, db: Session = Depends(get_db)):
     if not db_submission:
         raise HTTPException(status_code=404, detail="Submission not found")
     return db_submission
+
+@app.post("/login")
+def login(user_credentials: UserLogin, db: Session = Depends(get_db)):
+    user = crud.authenticate_user(db, user_credentials.email, user_credentials.password)
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+    return {"message": "Login successful", "user_id": user.id}

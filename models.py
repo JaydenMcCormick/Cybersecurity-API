@@ -10,9 +10,11 @@ class User(Base):
     name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     role = Column(String, nullable=False)  # 'student', 'instructor', 'admin'
+    password = Column(String, nullable=False)
 
     enrollments = relationship("Enrollment", back_populates="user")
     submissions = relationship("Submission", back_populates="user")
+
 
 # --- COURSES TABLE ---
 class Course(Base):

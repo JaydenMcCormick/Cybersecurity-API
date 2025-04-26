@@ -82,3 +82,11 @@ def create_post(db: Session, post: schemas.DiscussionPostCreate):
 
 def get_posts(db: Session, skip: int = 0, limit: int = 100):
     return db.query(DiscussionPost).offset(skip).limit(limit).all()
+
+def authenticate_user(db: Session, email: str, password: str):
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        return None
+    if user.password != password:
+        return None
+    return user
