@@ -10,7 +10,7 @@ import shutil
 import os
 import uuid
 from pathlib import Path
-from schemas import UserLogin
+from schemas import UserLogin, UserUpdate
 # Rate limiting imports
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
@@ -168,4 +168,21 @@ def login(user_credentials: UserLogin, db: Session = Depends(get_db)):
     user = crud.authenticate_user(db, user_credentials.email, user_credentials.password)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid email or password")
-    return {"message": "Login successful", "user_id": user.id}
+    return {
+        "message": "Login successful",
+        "user_id": user.id,
+        "user_name": user.name
+    }
+
+# Update a user (clean version)
+@app.patch("/users/{user_id}", response_model=schemas.User)
+def update_user(user_id: int, updated_user: UserUpdate, db: Session = Depends(get_db)):
+    db_user = db.query(models.User).filter(models.User.id == user_id).first()
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    db_user.name = updated_user.name
+    db_user.email = updated_user.email
+    db.commit()
+    db.refresh(db_user)
+    return db_user

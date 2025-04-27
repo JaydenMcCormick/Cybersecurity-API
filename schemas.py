@@ -25,6 +25,10 @@ class UserLogin(BaseModel):
     email: EmailStr
     password: str
 
+class UserUpdate(BaseModel):
+    name: str
+    email: str
+
 # Course schemas
 class CourseBase(BaseModel):
     title: TitleType
