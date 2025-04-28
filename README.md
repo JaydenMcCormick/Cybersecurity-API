@@ -149,7 +149,7 @@ Demo Script:
 
 SQL Injection Test (Login)
 
-- Input: jayden@test.com'--
+- Input: username'--
 - Expected Result: Login fails — input is safely handled through ORM.
 
 Arbitrary Upload Test
